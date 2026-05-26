@@ -1,4 +1,5 @@
 <div class="modulo-entradas">
+  
   <header class="header-seccion">
     <h1>🎟️ Panel de Venta de Entradas</h1>
     <p>Compra tus pases oficiales de forma simple y directa.</p>
@@ -7,19 +8,123 @@
   <div *ngIf="exitoMensaje" class="banner exito">{{ exitoMensaje }}</div>
   <div *ngIf="errorMensaje" class="banner error">{{ errorMensaje }}</div>
 
+  <div class="contenedor-carrusel">
+    <div id="carruselDestacados" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        
+        <div class="carousel-item active item-slide-1">
+          <div class="carrusel-capa-contenido">
+            <span class="badge-destacado">TOP VENTAS</span>
+            <h2>Concierto de Rock: Los Pixeles</h2>
+            <p>¡No te quedes fuera del mayor show de rock alternativo!</p>
+            <button class="boton-accion compacto" (click)="verDetalle(listaEntradas[0])">Ver Detalles</button>
+          </div>
+        </div>
+
+        <div class="carousel-item item-slide-2">
+          <div class="carrusel-capa-contenido">
+            <span class="badge-destacado urgente">¡Pocas Entradas!</span>
+            <h2>Festival Electrónica BeatDrop</h2>
+            <p>Los mejores DJs nacionales e internacionales en directo.</p>
+            <button class="boton-accion compacto" (click)="verDetalle(listaEntradas[1])">Ver Detalles</button>
+          </div>
+        </div>
+
+      </div>
+      
+      <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestacados" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carruselDestacados" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="navegador-filtros">
+    <div class="filtro-grupo grupo-busqueda">
+      <label for="buscar">🔍 Buscar Evento:</label>
+      <input 
+        id="buscar"
+        type="text" 
+        placeholder="Escribe el nombre del evento..." 
+        [(ngModel)]="textoBusqueda"
+        (input)="filtrarEntradas()">
+    </div>
+
+    <div class="filtro-grupo grupo-selector">
+      <label for="estado">Filtrar Estado:</label>
+      <select id="estado" [(ngModel)]="filtroEstado" (change)="filtrarEntradas()">
+        <option value="todos">Todos los estados</option>
+        <option value="disponible">Disponibles</option>
+        <option value="comprada">Compradas</option>
+      </select>
+    </div>
+  </nav>
+
   <div class="contenedor-grid">
-    <div class="tarjeta-evento" *ngFor="let item of listaEntradas">
+    <div class="tarjeta-evento" *ngFor="let item of entradasFiltradas">
       <div class="tarjeta-cabecera">
         <h3>{{ item.evento }}</h3>
-        <span class="etiqueta-estado">{{ item.estado }}</span>
+        <span class="etiqueta-estado" [ngClass]="item.estado.toLowerCase()">
+          {{ item.estado }}
+        </span>
       </div>
       <div class="tarjeta-cuerpo">
         <p>📅 <strong>Fecha:</strong> {{ item.fecha }}</p>
         <p class="precio-tag">{{ item.precio }}€</p>
       </div>
       <div class="tarjeta-acciones">
-        <button (click)="ejecutarCompra(item.id)" class="boton-accion">Comprar Entrada</button>
+        <button (click)="verDetalle(item)" class="boton-secundario">Detalles</button>
+        <button 
+          (click)="ejecutarCompra(item.id)" 
+          class="boton-accion" 
+          [disabled]="item.estado.toLowerCase() === 'comprada'">
+          {{ item.estado.toLowerCase() === 'disponible' ? 'Comprar' : 'Agotada' }}
+        </button>
       </div>
     </div>
   </div>
+
+  <div class="sin-resultados" *ngIf="entradasFiltradas.length === 0">
+    <p>No se encontraron entradas con los filtros aplicados.</p>
+  </div>
+
+  <div id="vista-detalle" class="contenedor-detalle-emergente" *ngIf="entradaSeleccionada">
+    <div class="tarjeta-detalle-completo">
+      <div class="detalle-cabecera">
+        <h2>Detalles de la Entrada #{{ entradaSeleccionada.id }}</h2>
+        <button class="boton-cerrar" (click)="cerrarDetalle()">✕</button>
+      </div>
+      
+      <div class="detalle-cuerpo">
+        <div class="info-principal">
+          <h3>{{ entradaSeleccionada.evento }}</h3>
+          <p class="detalle-fecha">📅 <strong>Día del Evento:</strong> {{ entradaSeleccionada.fecha }}</p>
+          <p class="detalle-precio">💰 <strong>Precio de Venta:</strong> {{ entradaSeleccionada.precio }}€</p>
+          <p>
+            <strong>Estado Actual: </strong>
+            <span class="etiqueta-estado" [ngClass]="entradaSeleccionada.estado.toLowerCase()">
+              {{ entradaSeleccionada.estado }}
+            </span>
+          </p>
+        </div>
+        
+        <div class="info-adicional">
+          <div class="simulador-ticket">
+            <span class="ticket-titulo">PASE OFICIAL</span>
+            <div class="codigo-barras-falso">||||| | | |||| || | || ||||</div>
+            <small class="text-muted">ID de Seguridad: SEC-{{ entradaSeleccionada.id }}2026</small>
+          </div>
+          <button 
+            (click)="ejecutarCompra(entradaSeleccionada.id)" 
+            class="boton-accion w-100" 
+            [disabled]="entradaSeleccionada.estado.toLowerCase() === 'comprada'">
+            {{ entradaSeleccionada.estado.toLowerCase() === 'disponible' ? 'Confirmar y Pagar' : 'Entrada No Disponible' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -1,16 +1,458 @@
-.modulo-entradas { max-width: 1100px; margin: 40px auto; padding: 0 20px; font-family: sans-serif; }
-.header-seccion { text-align: center; margin-bottom: 40px; }
-.header-seccion h1 { color: #1e293b; }
-.header-seccion p { color: #64748b; }
-.contenedor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-.tarjeta-evento { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-.tarjeta-cabecera { padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
-.etiqueta-estado { background: #e2f8f0; color: #059669; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-.tarjeta-cuerpo { padding: 20px; flex-grow: 1; }
-.precio-tag { font-size: 2rem; font-weight: bold; color: #0f172a; margin: 10px 0 0 0; }
-.tarjeta-acciones { padding: 20px; background: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-.boton-accion { width: 100%; background: #2563eb; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer; }
-.boton-accion:hover { background: #1d4ed8; }
-.banner { padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-.exito { background: #dcfce7; color: #166534; }
-.error { background: #fee2e2; color: #991b1b; }
+/* ==========================================================================
+   VARIABLES DE DISEÑO (Consistencia Visual y Limpieza)
+   ========================================================================== */
+:root {
+  --color-primario: #1e3a8a;       /* Azul corporativo profundo */
+  --color-secundario: #3b82f6;     /* Azul brillante para acciones secundarias */
+  --color-exito: #10b981;          /* Verde esmeralda para Disponible */
+  --color-comprada: #6b7280;       /* Gris neutral para Agotadas/Compradas */
+  --color-fondo-app: #f8fafc;      /* Fondo ultra claro y moderno */
+  --color-texto-oscuro: #0f172a;   /* Gris oscuro para máxima legibilidad */
+  --color-texto-mutado: #64748b;  
+  --shadow-tarjeta: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Contenedor general */
+.modulo-entradas {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-fondo-app);
+  padding: 2rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--color-texto-oscuro);
+}
+
+/* ==========================================================================
+   HEADER DE LA SECCIÓN
+   ========================================================================== */
+.header-seccion {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header-seccion h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+.header-seccion p {
+  color: var(--color-texto-mutado);
+  font-size: 1.1rem;
+}
+
+/* Banners de Mensajes */
+.banner {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+}
+.banner.exito { background-color: #ecfdf5; color: #065f46; border-left: 4px solid var(--color-exito); }
+.banner.error { background-color: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; }
+
+/* ==========================================================================
+   1. CORRECCIÓN Y ESTILO DEL CARRUSEL (Aislamiento de Seguridad)
+   ========================================================================== */
+.contenedor-carrusel {
+  margin-bottom: 3rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Forzado de comportamiento CSS en caso de que Bootstrap JS no actúe */
+.carousel-inner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-item {
+  position: relative;
+  display: none;
+  width: 100%;
+  align-items: center;
+  transition: transform 0.6s ease-in-out;
+}
+
+.carousel-item.active {
+  display: block;
+}
+
+/* Fondos de diapositivas degradados profesionales */
+.item-slide-1 { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+.item-slide-2 { background: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%); }
+
+.carrusel-capa-contenido {
+  padding: 4rem 3rem;
+  color: white;
+  text-align: center;
+  backdrop-filter: blur(2px);
+}
+
+.badge-destacado {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+.badge-destacado.urgente {
+  background-color: #ef4444;
+  border-color: #f87171;
+}
+
+.carrusel-capa-contenido h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.carrusel-capa-contenido p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   2. NAVEGADOR / BARRA DE FILTROS
+   ========================================================================== */
+.navegador-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  background-color: white;
+  padding: 1.25rem 1.75rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-tarjeta);
+  margin-bottom: 2.5rem;
+  align-items: flex-end;
+  border: 1px solid #f1f5f9;
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 250px;
+}
+
+.filtro-grupo label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.filtro-grupo input, 
+.filtro-grupo select {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--color-texto-oscuro);
+  background-color: #fff;
+  transition: var(--transicion);
+}
+
+.filtro-grupo input:focus, 
+.filtro-grupo select:focus {
+  outline: none;
+  border-color: var(--color-secundario);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* ==========================================================================
+   GRID DE TARJETAS (ESTILO EVENT CARDS REUTILIZABLES)
+   ========================================================================== */
+.contenedor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.75rem;
+  margin-bottom: 3rem;
+}
+
+.tarjeta-evento {
+  background-color: white;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: var(--shadow-tarjeta);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transicion);
+}
+
+.tarjeta-evento:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+  border-color: #cbd5e1;
+}
+
+.tarjeta-cabecera {
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.tarjeta-cabecera h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* Badges de Estado Limpios */
+.etiqueta-estado {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.etiqueta-estado.disponible {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.etiqueta-estado.comprada {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.tarjeta-cuerpo {
+  padding: 0.5rem 1.5rem 1.25rem 1.5rem;
+  flex-grow: 1;
+}
+
+.tarjeta-cuerpo p {
+  font-size: 0.9rem;
+  color: var(--color-texto-mutado);
+  margin-bottom: 0.75rem;
+}
+
+.precio-tag {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primario);
+  margin: 0.5rem 0 0 0 !important;
+}
+
+/* Contenedor de Acciones */
+.tarjeta-acciones {
+  padding: 1.25rem 1.5rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ==========================================================================
+   SISTEMA DE BOTONES PROFESIONALES
+   ========================================================================== */
+.boton-accion, .boton-secundario {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transicion);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.boton-accion {
+  background-color: var(--color-secundario);
+  color: white;
+  border: none;
+  flex: 1;
+}
+
+.boton-accion:hover:not(:disabled) {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.boton-accion:disabled {
+  background-color: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.boton-secundario {
+  background-color: white;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.boton-secundario:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+
+.boton-accion.compacto {
+  background-color: white;
+  color: var(--color-primario);
+  font-weight: 700;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  padding: 0.6rem 1.5rem;
+}
+.boton-accion.compacto:hover {
+  background-color: #f1f5f9;
+}
+
+.sin-resultados {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+  color: var(--color-texto-mutated);
+  font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   3. VISTA DE DETALLE (Diseño de Entrada Premium)
+   ========================================================================== */
+.contenedor-detalle-emergente {
+  margin-top: 4rem;
+  animation: cubicFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tarjeta-detalle-completo {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.detalle-cabecera {
+  background-color: var(--color-primario);
+  color: white;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detalle-cabecera h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.boton-cerrar {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transicion);
+}
+
+.boton-cerrar:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.detalle-cuerpo {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 3rem;
+  padding: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .detalle-cuerpo {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.info-principal h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.info-principal p {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Simulador de Ticket Físico con Línea de Puntos */
+.simulador-ticket {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px dashed #cbd5e1;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  margin-bottom: 1.5rem;
+}
+
+.ticket-titulo {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--color-texto-mutado);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.codigo-barras-falso {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: #000;
+  margin: 1rem 0;
+  user-select: none;
+  opacity: 0.85;
+}
+
+/* Animaciones */
+@keyframes cubicFadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

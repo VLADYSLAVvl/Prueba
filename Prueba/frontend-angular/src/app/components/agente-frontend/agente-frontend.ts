@@ -1,48 +1,95 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AgenteService } from '../../services/agente';
-import { Entrada } from '../../models/agente';
+import { FormsModule } from '@angular/forms';
+
+// Interfaces solicitadas y sincronizadas con tu backend
+export interface Usuario {
+  id: number;
+  nombre: string;
+  email: string;
+  entradas?: Entrada[];
+}
+
+export interface Entrada {
+  id: number;
+  evento: string;
+  fecha: string;
+  precio: number;
+  estado: string; // 'Disponible' o 'Comprada'
+  usuarioId?: number;
+}
 
 @Component({
   selector: 'app-agente-frontend',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './agente-frontend.html',
-  styleUrl: './agente-frontend.css'
+  styleUrls: ['./agente-frontend.css']
 })
-export class AgenteFrontendComponent implements OnInit {
-  listaEntradas: Entrada[] = [];
-  usuarioLogueadoId = 1; 
-  errorMensaje = '';
-  exitoMensaje = '';
+export class AgenteFrontendComponent implements OnInit { // Aseguramos que se llame AgenteFrontendComponent
+  exitoMensaje: string | null = null;
+  errorMensaje: string | null = null;
 
-  constructor(private agenteService: AgenteService) {}
+  // Lista base de entradas del catálogo
+  listaEntradas: Entrada[] = [
+    { id: 1, evento: 'Concierto de Rock: Los Pixeles', fecha: '2026-06-15', precio: 45, estado: 'Disponible' },
+    { id: 2, evento: 'Festival de Electrónica BeatDrop', fecha: '2026-07-22', precio: 80, estado: 'Disponible' },
+    { id: 3, evento: 'Obra de Teatro: Código Infinito', fecha: '2026-08-05', precio: 25, estado: 'Comprada' },
+    { id: 4, evento: 'Stand-up Comedy: Risas Sintácticas', fecha: '2026-05-30', precio: 15, estado: 'Disponible' }
+  ];
+
+  // Elementos filtrados que se muestran en la cuadrícula
+  entradasFiltradas: Entrada[] = [];
+
+  // Modelos de los filtros del navegador
+  textoBusqueda: string = '';
+  filtroEstado: string = 'todos';
+
+  // Propiedad para la vista detallada de la entrada seleccionada
+  entradaSeleccionada: Entrada | null = null;
 
   ngOnInit(): void {
-    this.obtenerEntradas();
+    this.entradasFiltradas = [...this.listaEntradas];
   }
 
-  obtenerEntradas(): void {
-    this.agenteService.getEntradasDisponibles().subscribe({
-      next: (datos) => this.listaEntradas = datos,
-      error: (err) => {
-        // Datos simulados por si el Java de tus compis está apagado
-        this.listaEntradas = [
-          { id: 101, evento: 'Concierto de Rock Estival', fecha: '2026-07-15', precio: 45, estado: 'Disponible' },
-          { id: 102, evento: 'Ópera Magna en el Teatro', fecha: '2026-08-22', precio: 80, estado: 'Disponible' },
-          { id: 103, evento: 'Festival Electrónico Nocturno', fecha: '2026-09-05', precio: 35, estado: 'Disponible' }
-        ];
+  // Método requerido por tu navegador de filtros en el HTML
+  filtrarEntradas(): void {
+    this.entradasFiltradas = this.listaEntradas.filter(item => {
+      const coincideTexto = item.evento.toLowerCase().includes(this.textoBusqueda.toLowerCase());
+      const coincideEstado = this.filtroEstado === 'todos' || item.estado.toLowerCase() === this.filtroEstado.toLowerCase();
+      return coincideTexto && coincideEstado;
+    });
+  }
+
+  // Método requerido por los botones del carrusel y tarjetas para ver el detalle extendido
+  verDetalle(item: Entrada): void {
+    this.entradaSeleccionada = item;
+    
+    // Scroll automático suave hacia el contenedor detallado inferior
+    setTimeout(() => {
+      document.getElementById('vista-detalle')?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  }
+
+  // Método requerido por el botón de cerrar (✕) de la vista de detalle
+  cerrarDetalle(): void {
+    this.entradaSeleccionada = null;
+  }
+
+  // Método para procesar la pasarela de compra de entradas
+  ejecutarCompra(id: number): void {
+    this.exitoMensaje = `¡Compra procesada con éxito para la entrada #${id}!`;
+    
+    const index = this.listaEntradas.findIndex(e => e.id === id);
+    if (index !== -1) {
+      this.listaEntradas[index].estado = 'Comprada';
+      this.filtrarEntradas(); // Refrescar la cuadrícula en caliente
+      
+      if (this.entradaSeleccionada?.id === id) {
+        this.entradaSeleccionada.estado = 'Comprada';
       }
-    });
-  }
+    }
 
-  ejecutarCompra(entradaId: number): void {
-    this.agenteService.comprarEntrada(entradaId, this.usuarioLogueadoId).subscribe({
-      next: (resultado) => {
-        this.exitoMensaje = `¡Compra realizada para: ${resultado.evento}!`;
-        this.obtenerEntradas();
-      },
-      error: (err) => this.errorMensaje = 'No se pudo conectar al servidor Java.'
-    });
+    setTimeout(() => this.exitoMensaje = null, 4000);
   }
 }

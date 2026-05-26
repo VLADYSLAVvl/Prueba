@@ -1,1 +1,198 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   1. VARIABLES DE DISEÑO INTERNAS
+   ========================================================================== */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  
+  /* Estados */
+  --disponible: #10b981;
+  --disponible-bg: #ecfdf5;
+  --comprada: #94a3b8;
+  --comprada-bg: #f8fafc;
+}
+
+/* ==========================================================================
+   2. CONTENEDOR PRINCIPAL (MÓDULO)
+   ========================================================================== */
+.modulo-entradas {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: var(--text-main);
+}
+
+.header-seccion {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.header-seccion h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.header-seccion p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   3. BANNERS DE NOTIFICACIÓN (*ngIf)
+   ========================================================================== */
+.banner {
+  padding: 14px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.banner.exito {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.banner.error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+/* ==========================================================================
+   4. LAYOUT / GRILLA RESPONSIVA
+   ========================================================================== */
+.contenedor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ==========================================================================
+   5. COMPONENTE: TARJETA DE EVENTO (*ngFor)
+   ========================================================================== */
+.tarjeta-evento {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-evento:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Cabecera de la Tarjeta */
+.tarjeta-cabecera {
+  padding: 20px 20px 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tarjeta-cabecera h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+/* Badge de Estado Dinámico */
+.etiqueta-estado {
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Estilos condicionales por texto usando selectores de atributos CSS */
+.etiqueta-estado[class*="disponible"], 
+.tarjeta-evento:has([class*="disponible"]) .etiqueta-estado {
+  background-color: var(--disponible-bg);
+  color: var(--disponible);
+}
+
+.etiqueta-estado[class*="comprada"],
+.tarjeta-evento:has([class*="comprada"]) .etiqueta-estado {
+  background-color: var(--comprada-bg);
+  color: var(--comprada);
+}
+
+/* Cuerpo de la Tarjeta */
+.tarjeta-cuerpo {
+  padding: 0 20px 20px 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.tarjeta-cuerpo p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 12px 0;
+}
+
+.precio-tag {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 !important;
+}
+
+/* Acciones / Botón */
+.tarjeta-acciones {
+  padding: 0 20px 20px 20px;
+}
+
+.boton-accion {
+  width: 100%;
+  background-color: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.boton-accion:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Estilo visual si la tarjeta simula estar deshabilitada por lógica */
+.tarjeta-evento:has(span:contains("comprada")) .boton-accion {
+  background-color: var(--border);
+  color: var(--comprada);
+  cursor: not-allowed;
+}
+
+/* Animación simple de entrada para los banners */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

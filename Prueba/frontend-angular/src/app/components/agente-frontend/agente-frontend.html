@@ -1,1 +1,25 @@
-<p>agente-frontend works!</p>
+<div class="modulo-entradas">
+  <header class="header-seccion">
+    <h1>🎟️ Panel de Venta de Entradas</h1>
+    <p>Compra tus pases oficiales de forma simple y directa.</p>
+  </header>
+
+  <div *ngIf="exitoMensaje" class="banner exito">{{ exitoMensaje }}</div>
+  <div *ngIf="errorMensaje" class="banner error">{{ errorMensaje }}</div>
+
+  <div class="contenedor-grid">
+    <div class="tarjeta-evento" *ngFor="let item of listaEntradas">
+      <div class="tarjeta-cabecera">
+        <h3>{{ item.evento }}</h3>
+        <span class="etiqueta-estado">{{ item.estado }}</span>
+      </div>
+      <div class="tarjeta-cuerpo">
+        <p>📅 <strong>Fecha:</strong> {{ item.fecha }}</p>
+        <p class="precio-tag">{{ item.precio }}€</p>
+      </div>
+      <div class="tarjeta-acciones">
+        <button (click)="ejecutarCompra(item.id)" class="boton-accion">Comprar Entrada</button>
+      </div>
+    </div>
+  </div>
+</div>

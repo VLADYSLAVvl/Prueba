@@ -1,0 +1,2 @@
+# formato: fecha_ISO|email|error_breve|detalle_opcional
+# Ejemplo: 2026-05-26T12:34:56Z|user@example.com|LOGIN_FAIL|Contraseña_incorrecta

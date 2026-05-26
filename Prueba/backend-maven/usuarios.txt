@@ -1,0 +1,3 @@
+# formato: id|nombre|email|contrasena|rol
+# Ejemplo: 1|Administrador|admin@example.com|admin123|admin
+1|Administrador|admin@example.com|admin123|admin
